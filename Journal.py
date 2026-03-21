@@ -6,7 +6,7 @@ import random
 app = Flask(__name__)
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL = "mistral:7b-instruct"
+MODEL = "mixtral:8x7b"
 
 # Function to call Ollama with a prompt
 def generate_with_ollama(system_prompt, model=MODEL, temperature = 0.8):
@@ -135,7 +135,7 @@ def generate():
         
         plot_points = [
         "no new plot point",
-    "no new plot point",
+    "The dog speaks for the first time, telling mateo about his abilities, he gets mateo to promise to keep his secret",
     "no new plot point",
     "no new plot point",
     "no new plot point",
@@ -201,6 +201,7 @@ def generate():
 ]
         current_mood = 1
         current_plot_index = 0
+        plot_point = "UPCOMING PLOT POINT(This Must happen in your output)" + plot_points[current_plot_index]
         print(plot_points[current_plot_index])
 
         
@@ -210,7 +211,7 @@ def generate():
 
         world_facts = "WORLD FACTS: - The story takes place in a small, run-down town in the southwestern United States in the late 20th century. - Technology is limited to what is commonly available in that time (no smartphones, no advanced surveillance systems). - The environment is grounded and realistic. No supernatural events exist except for the talking dog and its ability. - The dog can predict events only up to 30 seconds into the future. The predictions are always accurate but limited strictly to that time window. - The dog cannot see beyond 30 seconds and cannot explain why events happen, only what will happen. - If other people discover the dog can talk or predict the future, both the boy and the dog risk being taken away, studied, or separated. - Money is scarce for the boy’s family. Small amounts of cash can make a meaningful difference. - Actions have realistic consequences. Risky behavior can lead to trouble with other people, authority figures, or dangerous situations."
         world_facts_log = "World Facts\n\n"
-        world_facts_log += "WORLD FACTS: - The story takes place in a small, run-down town in the southwestern United States in the late 20th century. - Technology is limited to what is commonly available in that time (no smartphones, no advanced surveillance systems). - The environment is grounded and realistic. No supernatural events exist except for the talking dog and its ability. - The dog can predict events only up to 30 seconds into the future. The predictions are always accurate but limited strictly to that time window. - The dog cannot see beyond 30 seconds and cannot explain why events happen, only what will happen. - If other people discover the dog can talk or predict the future, both the boy and the dog risk being taken away, studied, or separated. - Money is scarce for the boy’s family. Small amounts of cash can make a meaningful difference. - Actions have realistic consequences. Risky behavior can lead to trouble with other people, authority figures, or dangerous situations."
+        world_facts_log += "WORLD FACTS: - The story takes place in a small, run-down town in the southwestern United States in the late 20th century. - Technology is limited to what is commonly available in that time (no smartphones, no advanced surveillance systems). - The environment is grounded and realistic. No supernatural events exist except for the talking dog(rocket) and its ability. - The dog(rocket) can predict events only up to 30 seconds into the future. The predictions are always accurate but limited strictly to that time window. - The dog(rocket) cannot see beyond 30 seconds and cannot explain why events happen, only what will happen. - If other people discover the dog can talk or predict the future, both the boy and the dog(rocket) risk being taken away, studied, or separated. - Money is scarce for the boy’s family. Small amounts of cash can make a meaningful difference. - Actions have realistic consequences. Risky behavior can lead to trouble with other people, authority figures, or dangerous situations."
         Cycles = 1
         Variable = "I love Dogs"
         Variable += "and cats"
@@ -236,8 +237,8 @@ def generate():
 
 
 
-        strict_model = "llama3:8b"
-        free_model = "hf.co/QuantFactory/NeuralDaredevil-8B-abliterated-GGUF:Q4_K_M"
+        strict_model = "mixtral:8x7b"
+        free_model = "mixtral:8x7b"
 
         # Generate character_action
         Ai_Personality = "Choose a realistic action based on your personality and your memory"
@@ -259,7 +260,7 @@ def generate():
         summarize_log = "Summary Log\n"
 
 
-        max_turns = 15
+        max_turns = 5
         turn_counter = 1
         
     
@@ -286,7 +287,7 @@ def generate():
         print("\n\n\n\n--Scene State Prompt --\n\n", scene_state_prompt)
         print("\n\n--Scene State Outcome--\n\n", scene_state)
 
-        director_prompt = ("You are a strict narrative simulator.\\nRECENT STORY EVENTS\\n", story_log, "\nYour job is to generate the NEXT immediate situation that should happen in the story.\n RULES - Describe a physical situation, interruption, discovery, or decision pressure.\n - Do NOT narrate the outcome.\n - Do NOT explain anything.\n - Do NOT repeat previous situations.\n - Avoid mysterious observers or supernatural forces unless the plot point includes them.\n CHARACTER ACTION must occur at the beggining of your output\n\n CURRENT WORLD FACTS", world_facts, "SCENE STATE", scene_state, "\nNPC MOTIVES\n", npc_motive,  "\nCHARACTER ACTION\n", character_action, "TASK:\n - Determine what actually happens physically.\n - Follow world rules strictly.\n - Do not narrate.\n - Do not be creative. \n You must move the story forward, characters are not allowed to just investigate\n Do not use the enviroment to describe emotions\n OUTPUT FORMAT: Bullet list of factual events only. ")        
+        director_prompt = ("You are a strict narrative simulator.\\nRECENT STORY EVENTS\\n", summarize_log, "\nYour job is to generate the NEXT immediate situation that should happen in the story.\n RULES - Describe a physical situation, interruption, discovery, or decision pressure.\n - Do NOT narrate the outcome.\n - Do NOT explain anything.\n - Do NOT repeat previous situations.\n - Avoid mysterious observers or supernatural forces unless the plot point includes them.\n - All events must directly involve ONLY elements present in SCENE STATE or explicitly introduced in RECENT STORY EVENTS.\n - Do NOT introduce new structures, locations, or objects unless they logically exist in the current scene state.\n - Only introduce elements consistent with CURRENT WORLD FACTS.\n - Each event must change the situation in a meaningful way (new information, new risk, or new opportunity).\n - Do NOT repeat similar interactions without escalation or a new outcome.\n CHARACTER ACTION must occur at the beggining of your output\n\n CURRENT WORLD FACTS", world_facts, "SCENE STATE", scene_state, "\nNPC MOTIVES\n", npc_motive,  "\nCHARACTER ACTION\n", character_action, "TASK:\n - Determine what actually happens physically.\n - Follow world rules strictly.\n - Do not narrate.\n - Do not be creative.\n", plot_point,  "OUTPUT FORMAT: Bullet list of factual events only. ")
         direction = generate_with_ollama(director_prompt, model= strict_model, temperature = .2)
         print("\n\n\n\n--Director Prompt --\n\n", director_prompt)
         print("\n\n--Director Outcome--\n\n", direction)
@@ -296,19 +297,16 @@ def generate():
         simulator = generate_with_ollama(simulator_prompt, model=free_model, temperature=0.7)
         print("\n\n\n\n--Simulator Prompt --\n\n", simulator_prompt)
         print("\n\n--Simulator Outcome--\n\n", simulator)
-        current_turn += 1
-        if current_turn == plot_frequency:
-            current_plot_index +=1
-            current_turn = 0
+        
        
              
             
-        summarize_prompt = ( "Summarize the following story update into as little words as you can. Do not write code, programming syntax, or explanations. Output plain text only. Only keep information that may matter for future events. Ignore narration, descriptive prose, and basic.\n\n", "STORY_UPDATE:", character_action, simulator, "Write 2 to 4 very short bullet style lines describing what actually happened. Each line should describe one concrete event, discovery, or interaction. Keep every line under 20 words. Begin each line with '- '.", "End the response with '__END__'" )
+        summarize_prompt = ( "Summarize the following story update into as little words as you can. Do not write code, programming syntax, or explanations. Output plain text only. Only keep information that may matter for future events. Ignore narration, descriptive prose, and basic.\n\n", "STORY_UPDATE:", simulator, "Write 2 to 4 very short bullet style lines describing what actually happened. Each line should describe one concrete event, discovery, or interaction. Keep every line under 20 words. Begin each line with '-'\nEnd the response with '__END__'" )
         summarize = generate_with_ollama(summarize_prompt)
         print("\n\n\n\n--Summarize Prompt --\n\n", summarize_prompt)
         print("\n\n--Summarize Outcome--\n\n", summarize)
 
-        world_facts_prompt = ( "You are a WORLD STATE RECORDER. Your job is to extract ONLY objective world facts that permanently changed. RULES: - Write short factual statements. - No narration. - No metaphors. - No speculation. - No emotions. - Do NOT repeat facts that already exist. - Only include NEW persistent facts. Good facts examples: - Gorvoth possesses a magical cornucopia that can conjure objects he imagines. - A wooden stool was conjured near Gorvoth's camp. - Gorvoth created several silver coins. - Gorvoth stored the coins in a pouch. Bad facts examples: - The wind whispered secrets. - Gorvoth felt powerful. - The air was full of tension. - Something mysterious seemed to happen. Use the information below to determine if a new world fact occurred. PERSONALITY INTENT: CHARACTER ACTION:", character_action, "SIMULATOR RESULT:", simulator, "CURRENT EMOTION:", seed_emotion, "CURRENT WORLD FACTS", world_facts_log, "Return ONLY the new facts. If no new facts occurred, return: NONE\n Do not explain youself, Do not add any extra text, in the next part of the story the dog should reveal his abilities to the boy if he hasnt already ")
+        world_facts_prompt = ( "You are a WORLD STATE RECORDER. Your job is to extract ONLY objective world facts that permanently changed. RULES: - Write short factual statements. - No narration. - No metaphors. - No speculation. - No emotions. - Do NOT repeat facts that already exist. - Only include NEW persistent facts CHARACTER ACTION:", character_action, "SIMULATOR RESULT:", simulator, "CURRENT EMOTION:", seed_emotion, "CURRENT WORLD FACTS", world_facts_log, "Return ONLY the new facts. If no new facts occurred, return: NONE\n Do not explain youself, Do not add any extra text, in the next part of the story the dog should reveal his abilities to the boy if he hasnt already ")
         world_facts = generate_with_ollama(world_facts_prompt, model= strict_model, temperature = .4)
         world_facts_log += world_facts
         print("\n\n\n\n--World Facts Prompt --\n\n", world_facts_prompt)
@@ -357,7 +355,7 @@ def generate():
         print("\n\n\n\n--Scene State Prompt --\n\n", scene_state_prompt)
         print("\n\n--Scene State Outcome--\n\n", scene_state)
 
-        director_prompt = ("You are a strict narrative simulator.\\nRECENT STORY EVENTS\\n", summarize_log, "\nYour job is to generate the NEXT immediate situation that should happen in the story.\n RULES - Describe a physical situation, interruption, discovery, or decision pressure.\n - Do NOT narrate the outcome.\n - Do NOT explain anything.\n - Do NOT repeat previous situations.\n - Avoid mysterious observers or supernatural forces unless the plot point includes them.\n CHARACTER ACTION must occur at the beggining of your output\n\n CURRENT WORLD FACTS", world_facts, "SCENE STATE", scene_state, "\nNPC MOTIVES\n", npc_motive,  "\nCHARACTER ACTION\n", character_action, "TASK:\n - Determine what actually happens physically.\n - Follow world rules strictly.\n - Do not narrate.\n - Do not be creative.\n OUTPUT FORMAT: Bullet list of factual events only. ")        
+        director_prompt = ("You are a strict narrative simulator.\\nRECENT STORY EVENTS\\n", summarize_log, "\nYour job is to generate the NEXT immediate situation that should happen in the story.\n RULES - Describe a physical situation, interruption, discovery, or decision pressure.\n - Do NOT narrate the outcome.\n - Do NOT explain anything.\n - Do NOT repeat previous situations.\n - Avoid mysterious observers or supernatural forces unless the plot point includes them.\n - All events must directly involve ONLY elements present in SCENE STATE or explicitly introduced in RECENT STORY EVENTS.\n - Do NOT introduce new structures, locations, or objects unless they logically exist in the current scene state.\n - Only introduce elements consistent with CURRENT WORLD FACTS.\n - Each event must change the situation in a meaningful way (new information, new risk, or new opportunity).\n - Do NOT repeat similar interactions without escalation or a new outcome.\n CHARACTER ACTION must occur at the beggining of your output\n\n CURRENT WORLD FACTS", world_facts, "SCENE STATE", scene_state, "\nNPC MOTIVES\n", npc_motive,  "\nCHARACTER ACTION\n", character_action, "TASK:\n - Determine what actually happens physically.\n - Follow world rules strictly.\n - Do not narrate.\n - Do not be creative.\n OUTPUT FORMAT: Bullet list of factual events only. ")
         direction = generate_with_ollama(director_prompt, model= strict_model, temperature = .2)
         print("\n\n\n\n--Director Prompt --\n\n", director_prompt)
         print("\n\n--Director Outcome--\n\n", direction)
@@ -367,10 +365,7 @@ def generate():
         simulator = generate_with_ollama(simulator_prompt, model=free_model, temperature=0.7)
         print("\n\n\n\n--Simulator Prompt --\n\n", simulator_prompt)
         print("\n\n--Simulator Outcome--\n\n", simulator)
-        current_turn += 1
-        if current_turn == plot_frequency:
-            current_plot_index +=1
-            current_turn = 0
+        
         
 
         summarize_prompt = ( "Summarize the following story update into as little words as you can. Do not write code, programming syntax, or explanations. Output plain text only. Only keep information that may matter for future events. Ignore narration, descriptive prose, and basic.\n\n", "STORY_UPDATE:", character_action, simulator, "Write 2 to 4 very short bullet style lines describing what actually happened. Each line should describe one concrete event, discovery, or interaction. Keep every line under 20 words. Begin each line with '- '.", "End the response with '__END__'" )
@@ -378,7 +373,7 @@ def generate():
         print("\n\n\n\n--Summarize Prompt --\n\n", summarize_prompt)
         print("\n\n--Summarize Outcome--\n\n", summarize)
 
-        world_facts_prompt = ( "You are a WORLD STATE RECORDER. Your job is to extract ONLY objective world facts that permanently changed. RULES: - Write short factual statements. - No narration. - No metaphors. - No speculation. - No emotions. - Do NOT repeat facts that already exist. - Only include NEW persistent facts. Good facts examples: - Gorvoth possesses a magical cornucopia that can conjure objects he imagines. - A wooden stool was conjured near Gorvoth's camp. - Gorvoth created several silver coins. - Gorvoth stored the coins in a pouch. Bad facts examples: - The wind whispered secrets. - Gorvoth felt powerful. - The air was full of tension. - Something mysterious seemed to happen. Use the information below to determine if a new world fact occurred. PERSONALITY INTENT: CHARACTER ACTION:", character_action, "SIMULATOR RESULT:", simulator, "CURRENT EMOTION:", emotion, "CURRENT WORLD FACTS", world_facts_log, "Return ONLY the new facts. If no new facts occurred, return: NONE ")
+        world_facts_prompt = ( "You are a WORLD STATE RECORDER. Your job is to extract ONLY objective world facts that permanently changed. RULES: - Write short factual statements. - No narration. - No metaphors. - No speculation. - No emotions. - Do NOT repeat facts that already exist. - Only include NEW persistent facts CHARACTER ACTION:", character_action, "SIMULATOR RESULT:", simulator, "CURRENT EMOTION:", emotion, "CURRENT WORLD FACTS", world_facts_log, "Return ONLY the new facts. If no new facts occurred, return: NONE\n Do not explain youself, Do not add any extra text, in the next part of the story the dog should reveal his abilities to the boy if he hasnt already ")
         world_facts = generate_with_ollama(world_facts_prompt, model= strict_model, temperature = .2)
         world_facts_log += world_facts
         print("\n\n\n\n--World Facts Prompt --\n\n", world_facts_prompt)
@@ -428,7 +423,7 @@ def generate():
         print("\n\n\n\n--Scene State Prompt --\n\n", scene_state_prompt)
         print("\n\n--Scene State Outcome--\n\n", scene_state)
 
-        director_prompt = ("You are a strict narrative simulator.\\nRECENT STORY EVENTS\\n", summarize_log, "\nYour job is to generate the NEXT immediate situation that should happen in the story.\n RULES - Describe a physical situation, interruption, discovery, or decision pressure.\n - Do NOT narrate the outcome.\n - Do NOT explain anything.\n - Do NOT repeat previous situations.\n - Avoid mysterious observers or supernatural forces unless the plot point includes them.\n CHARACTER ACTION must occur at the beggining of your output\n\n CURRENT WORLD FACTS", world_facts, "SCENE STATE", scene_state, "\nNPC MOTIVES\n", npc_motive,  "\nCHARACTER ACTION\n", character_action, "TASK:\n - Determine what actually happens physically.\n - Follow world rules strictly.\n - Do not narrate.\n - Do not be creative.\n OUTPUT FORMAT: Bullet list of factual events only. ")        
+        director_prompt = ("You are a strict narrative simulator.\\nRECENT STORY EVENTS\\n", summarize_log, "\nYour job is to generate the NEXT immediate situation that should happen in the story.\n RULES - Describe a physical situation, interruption, discovery, or decision pressure.\n - Do NOT narrate the outcome.\n - Do NOT explain anything.\n - Do NOT repeat previous situations.\n - Avoid mysterious observers or supernatural forces unless the plot point includes them.\n - All events must directly involve ONLY elements present in SCENE STATE or explicitly introduced in RECENT STORY EVENTS.\n - Do NOT introduce new structures, locations, or objects unless they logically exist in the current scene state.\n - Only introduce elements consistent with CURRENT WORLD FACTS.\n - Each event must change the situation in a meaningful way (new information, new risk, or new opportunity).\n - Do NOT repeat similar interactions without escalation or a new outcome.\n CHARACTER ACTION must occur at the beggining of your output\n\n CURRENT WORLD FACTS", world_facts, "SCENE STATE", scene_state, "\nNPC MOTIVES\n", npc_motive,  "\nCHARACTER ACTION\n", character_action, "TASK:\n - Determine what actually happens physically.\n - Follow world rules strictly.\n - Do not narrate.\n - Do not be creative.\n", plot_point, "OUTPUT FORMAT: Bullet list of factual events only. ")
         direction = generate_with_ollama(director_prompt, model= strict_model, temperature = .2)
         print("\n\n\n\n--Director Prompt --\n\n", director_prompt)
         print("\n\n--Director Outcome--\n\n", direction)
@@ -438,10 +433,8 @@ def generate():
         simulator = generate_with_ollama(simulator_prompt, model=free_model, temperature=0.7)
         print("\n\n\n\n--Simulator Prompt --\n\n", simulator_prompt)
         print("\n\n--Simulator Outcome--\n\n", simulator)
-        current_turn += 1
-        if current_turn == plot_frequency:
-            current_plot_index +=1
-            current_turn = 0
+        
+        
 
         summarize_prompt = ( "Summarize the following story update into as little words as you can. Do not write code, programming syntax, or explanations. Output plain text only. Only keep information that may matter for future events. Ignore narration, descriptive prose, and basic.\n\n", "STORY_UPDATE:", character_action, simulator, "Write 2 to 4 very short bullet style lines describing what actually happened. Each line should describe one concrete event, discovery, or interaction. Keep every line under 20 words. Begin each line with '- '.", "End the response with '__END__'" )
         summarize = generate_with_ollama(summarize_prompt, model= strict_model, temperature = .4)
@@ -451,7 +444,7 @@ def generate():
         print("\n\n--Summarize Log--\n\n", summarize_log)
 
 
-        world_facts_prompt = ( "You are a WORLD STATE RECORDER. Your job is to extract ONLY objective world facts that permanently changed. RULES: - Write short factual statements. - No narration. - No metaphors. - No speculation. - No emotions. - Do NOT repeat facts that already exist. - Only include NEW persistent facts. Good facts examples: - Gorvoth possesses a magical cornucopia that can conjure objects he imagines. - A wooden stool was conjured near Gorvoth's camp. - Gorvoth created several silver coins. - Gorvoth stored the coins in a pouch. Bad facts examples: - The wind whispered secrets. - Gorvoth felt powerful. - The air was full of tension. - Something mysterious seemed to happen. Use the information below to determine if a new world fact occurred. PERSONALITY INTENT: CHARACTER ACTION:", character_action, "SIMULATOR RESULT:", simulator, "CURRENT EMOTION:", emotion, "CURRENT WORLD FACTS", world_facts_log, "Return ONLY the new facts. If no new facts occurred, return: NONE ")
+        world_facts_prompt = ( "You are a WORLD STATE RECORDER. Your job is to extract ONLY objective world facts that permanently changed. RULES: - Write short factual statements. - No narration. - No metaphors. - No speculation. - No emotions. - Do NOT repeat facts that already exist. - Only include NEW persistent facts CHARACTER ACTION:", character_action, "SIMULATOR RESULT:", simulator, "CURRENT EMOTION:", emotion, "CURRENT WORLD FACTS", world_facts_log, "Return ONLY the new facts. If no new facts occurred, return: NONE\n Do not explain youself, Do not add any extra text, in the next part of the story the dog should reveal his abilities to the boy if he hasnt already ")
 
         world_facts = generate_with_ollama(world_facts_prompt, model= strict_model, temperature = .2)
         world_facts_log += world_facts
@@ -466,6 +459,18 @@ def generate():
         Cycles +=1
         turn_counter +=1
         print("\n\n\n", Cycles, "\n\n\n")
+        
+        current_turn += 1
+        if current_turn == plot_frequency:
+            current_plot_index +=1
+            current_turn = 0
+            plot_point = "- The following plot point MUST occur in this step and be shown through physical events:" + plot_points[current_plot_index]
+        else:
+         plot_point = "\n"
+
+
+
+
 
         simulator_last_three += simulator
         simulator_count += 1
